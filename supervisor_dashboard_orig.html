@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+ "http://www.w3.org/TR/html4/strict.dtd">
+ 
+<html lang="en">
+<head>
+    <title>Supervisor Dashboard</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
+    <link rel="stylesheet" href="http://static.office.pirc.co.uk/themes/pirc-theme/jquery-ui-1.8.custom.css" type="text/css">
+    <script type="text/javascript" src="http://static.office.pirc.co.uk/jquery/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="http://static.office.pirc.co.uk/jquery/jquery-ui-1.8.min.js"></script>
+    <script type="text/javascript" src="http://static.office.pirc.co.uk/sammy/sammy-0.5.3.min.js"></script>
+    <script type="text/javascript" src="http://static.office.pirc.co.uk/sammy/plugins/sammy.storage-0.5.3.min.js"></script>
+    <style type="text/css" media="screen">
+        a {text-decoration: none}
+        #doc3 {
+            margin: 0;
+            padding: 0;
+            min-width: 750px;
+        }
+        #bd {
+            margin: 15px;
+        }
+        #hd {
+            height: 75px;
+            background: url(/imgs/top_wrapper_bg.jpg);
+            background-color: #2E2E2E;
+            padding: 0 75px 0 75px;
+        }
+        #nav {
+            float: right;
+            height: 75px;
+            line-height: 100%;
+            padding: 28px 0 0 0;
+        }
+
+        #nav a {
+            color: #a5a5a5;
+            font: bold 12px arial;
+            text-align: left;
+            text-shadow: #000 0 -1px 1px;
+            margin: 0 0 0 20px;
+        }
+
+        #nav a:hover {
+            color:#e9e9e9;
+        }
+
+        #nav a.selected {
+            color:#e9e9e9;
+        }
+        #title {
+            float: left;
+            height: 75px;
+            line-height: 100%;
+            padding: 20px 0 0 0;
+        }
+        #title p {
+            color: #a5a5a5;
+            font: bold 25px arial;
+            text-shadow: #000 0 -1px 1px;
+        }
+        .host {
+            -moz-border-radius: 8px;
+        	-webkit-border-radius: 8px;
+        	padding: 10px 10px 10px 75px;
+        	margin: 5px 0;
+        	border: 1px solid #bbb;
+        	height: 40px;
+        	min-height: 40px;
+        	position: relative;
+        	/*overflow: hidden;*/
+        }
+        .host .head {
+            width: 100%;
+        }
+        .host .status {
+            border: 1px solid #bbb;
+            -moz-border-radius: 3px;
+        	-webkit-border-radius: 3px;
+        	left: 10px;
+        	padding: 4px 2px;
+        	margin: 0;
+        	position: absolute;
+        	text-align: center;
+        	top: 15px;
+        	width: 50px;
+        	height: 20px;
+        	line-height: 20px;
+        }
+        .status.running {background-color: #4EE271;}
+        .status.stopped {background-color: #EDEC76;}
+        .status.error {background-color: #FA7881;}
+        .host h3 {
+            color: #0A7BC1;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .host .expand {
+            position: absolute;
+            right: 10px;
+            top: 15px;
+        }
+        .host .detail {
+            border: 1px solid #bbb;
+            -moz-border-radius: 3px;
+        	-webkit-border-radius: 3px;
+        	margin: 20px 0 0 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="doc3" class="yui-t7">
+        <div id="hd">
+            <div id="title">
+                <p>Supervisor Dashboard</p>
+            </div>
+            <div id="nav">
+                <a href="#/add" id="add">Add host</a>
+                <a href="#/" id="refresh">Refresh</a>
+            </div>
+        </div>
+        
+        <div id="bd">
+	        <div class="yui-g">
+                <div id="1" class="host">
+                    <div class="head">
+                        <div class="status stopped">Stopped</div>
+                        <h3 class="address">headingley.office.pirc.co.uk</h3>
+                        <p class="summary">5 processes, 2 stopped, 3 running</p>
+                        <div class="expand"><a href="#/detail">detail</a></div>
+                    </div>
+                    
+                    <div class="detail">
+                        <div class="controls"></div>
+                        <div class="processes"></div>
+                    </div>
+                    
+                </div>
+                <div id="2" class="host">
+                    <div class="status running">Running</div>
+                    <h3 class="address">theoval.office.pirc.co.uk</h3>
+                    <p class="summary">2 processes, 2 running</p>
+                    <div class="expand"><a href="#/detail">detail</a></div>
+                </div>
+                <div id="3" class="host">
+                    <div class="status error">Error</div>
+                    <h3 class="address">belmarsh.office.pirc.co.uk</h3>
+                    <p class="summary">5 processes, 4 running, 1 error</p>
+                    <div class="expand"><a href="#/detail">detail</a></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="ft"></div>
+    </div>
+</body>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('.expand a').button({icons: {primary: 'ui-icon-info'}, text: false});
+        
+        $('.expand a').live('click', function(e){
+            var that = $(this);
+            var container = that.parent().parent();
+            
+            // Need to set starting width explicitly to stop odd resizing issue
+            //var starting_width = container.width();
+            //container.css({'width':starting_width});
+            
+            if (that.hasClass('expanded')) {
+                var transformation = '-=400';
+            } else {
+                var transformation = '+=400';
+            };
+            
+            container.animate({height: transformation}, 'fast', function(){
+                that.toggleClass('expanded');
+            });
+        })
+    });
+    
+</script>
+
+</html>
