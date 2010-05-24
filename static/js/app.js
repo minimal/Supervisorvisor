@@ -25,6 +25,11 @@ var SupervisorNode = Base.extend({
         console.log('Stopping proc id ' + proc_id);
         return this;
     },
+    
+    restart_process: function(proc_id) {
+        console.log('Restarting proc id ' + proc_id);
+        return this;
+    }
 });
 
 
