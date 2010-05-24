@@ -20,10 +20,15 @@
         #doc3 {
             margin: 0;
             padding: 0;
-            min-width: 750px;
         }
         #bd {
-            margin: 16px;
+            margin: 16px auto;
+            width: 950px;
+            /*min-width: 950px;*/
+        }
+        #hd #wrapper {
+            width: 950px;
+            margin: auto;
         }
         #hd {
             height: 75px;
@@ -167,14 +172,16 @@
 </head>
 
 <body>
-    <div id="doc" class="yui-t7">
+    <div id="doc3" class="yui-t7">
         <div id="hd">
+            <div id="wrapper">
             <div id="title">
                 <p>Supervisor Dashboard</p>
             </div>
             <div id="nav">
                 <a href="#/add" id="add">Add host</a>
                 <a href="#/" id="refresh">Refresh</a>
+            </div>
             </div>
         </div>
         
