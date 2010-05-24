@@ -12,6 +12,7 @@ var SupervisorNode = Base.extend({
     
     restart_all: function() {
         console.log('Restarting all processes on node ' + this.name);
+        //TODO: restart_all() should issue the request, then trigger update_all() to display "restarting" status
         return this;
     },
     
@@ -34,20 +35,22 @@ var SupervisorNode = Base.extend({
         //this.use(Sammy.Haml);
         this.element_selector = '#main_content'; 
         
-        // Front content (all collapsed)
-        this.get('#/', function(context) {
-            // Collapse all sections NOTE: Won't be needed when the sections are recreated
-            $('.host.expanded').each(function(idx, elem){collapse_host(elem)});
-            
+        this.before(function(context){
             $('.host').each(function(idx, elem){
                 var elem = $(elem);
                 var node = new SupervisorNode(elem.attr('id'));
                 // node.update()
                 elem.data('node_object', node);
             });
+        });
+        
+        // Front content (all collapsed)
+        this.get('#/', function(context) {
+            // Collapse all sections NOTE: Won't be needed when the sections are recreated
+            $('.host.expanded').each(function(idx, elem){collapse_host(elem)});
+            
             // TODO: Build each section, call the ajax with update function on success. For each section display activity indicator
-            // For each host configured (each .host elem), create a node object, call .update() on each
-            // Attach node object as data
+            // call .update() on each node object
         });
         
         // Expand the node section
@@ -59,21 +62,27 @@ var SupervisorNode = Base.extend({
             return false;
         });
         
-        // Restart all process groups on node
-        this.get('#/node/:node_name/restart_all', function(context) {
+        // Supervisor node controls (restart_all, stop_all)
+        this.get('#/node/:node_name/:action', function(context) {
             var target = $('#'+context.params['node_name']);
             expand_host(target);
             var node = target.data('node_object');
             
+            var per_action_options = {
+                'restart_all': {dialog_title: 'Restart all processes?', dialog_msg: 'Are you sure?', node_action: node.restart_all},
+                'stop_all': {dialog_title: 'Stop all processes?', dialog_msg: 'Are you sure?', node_action: node.stop_all},
+            };
+            
+            var options = per_action_options[context.params['action']];
             // Display confirmation
-            var elem = $('<div id="confirmation" title="Restart all processes?"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Are you sure?</p></div>').dialog({
+            var elem = $('<div id="confirmation" title="'+options.dialog_title+'"><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>'+options.dialog_msg+'</p></div>').dialog({
                 height: 140, modal: true,
     			buttons: {
-    				'Restart all': function() {
+    				'Yes, Go ahead': function() {
     				    $(this).dialog('close');
-    				    node.restart_all(); //TODO: restart_all() should issue the request, then trigger update_all() to display "restarting" status
+    				    options.node_action();
     				},
-    				Cancel: function() {
+    				'No, cancel': function() {
     					$(this).dialog('close');
     				}
     			}
