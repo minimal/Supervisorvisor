@@ -6,7 +6,7 @@ except ImportError:
     import json
 
 import os.path as path
-from bottle import redirect, request, route, send_file
+from bottle import redirect, request, response, route, send_file
 from mako.lookup import TemplateLookup
 
 
@@ -27,17 +27,20 @@ def index():
 @route('/nodes/')
 def list_nodes():
     """"""
-    return json.dumps([])
+    response.content_type = 'application/json; charset=UTF-8'
+    known_hosts = dict([(host, '/nodes/%s/' % host) for host in rpclib.get_hosts()])
+    return json.dumps(known_hosts)
 
 
-@route('/node/:name')
-@route('/node/:name/')
+@route('/nodes/:name')
+@route('/nodes/:name/')
 def node_status(name):
     """Return the status of a node"""
-    return json.dumps({})
+    response.content_type = 'application/json; charset=UTF-8'
+    return json.dumps(rpclib.get_states(rpclib.hosts[name]))
 
 
-@route('/node/:name/control/')
+@route('/nodes/:name/control/')
 def node_control(name, action):
     """Initiate an action on the node"""
     pass
