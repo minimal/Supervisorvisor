@@ -9,5 +9,5 @@
 
     $ git clone git://github.com/robcowie/Supervisorvisor.git
     >>> python Supervisorvisor
-    >>> ## OR, for Python <2.5
+    >>> ## OR, for Python < 2.6
     >>> python Supervisorvisor/__main__.py
