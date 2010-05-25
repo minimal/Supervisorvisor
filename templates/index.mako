@@ -187,7 +187,7 @@
         
         <div id="bd">
 	        <div class="yui-g" id="main_content">
-                <div id="headingley" class="host">
+                <!-- <div id="headingley" class="host">
                     <div class="summary">
                         <div class="status stopped">Stopped</div>
                         <h3 class="address">headingley.office.pirc.co.uk</h3>
@@ -195,7 +195,6 @@
                         <div class="trafficlights">
                             <span class="running">&nbsp;</span><span class="running">&nbsp;</span><span class="stopped">&nbsp;</span>
                         </div>
-                        <!-- <div class="remove"><a href="#/headingley/remove">remove</a></div> -->
                         <div class="expand"><a href="#/node/headingley">detail</a></div>
                     </div>
                     
@@ -240,7 +239,6 @@
                         <div class="status running">Running</div>
                         <h3 class="address">theoval.office.pirc.co.uk</h3>
                         <p class="">2 processes, 2 running</p>
-                        <!-- <div class="remove"><a href="#/theoval/remove">remove</a></div> -->
                         <div class="expand"><a href="#/node/theoval">detail</a></div>
                     </div>
                     
@@ -257,7 +255,6 @@
                         <div class="status error">Error</div>
                         <h3 class="address">belmarsh.office.pirc.co.uk</h3>
                         <p class="">5 processes, 4 running, 1 error</p>
-                        <!-- <div class="remove"><a href="#/belmarsh/remove">remove</a></div> -->
                         <div class="expand"><a href="#/node/belmarsh">detail</a></div>
                     </div>
                     
@@ -268,7 +265,7 @@
                         </div>
                         <div class="processes"></div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         

@@ -5,9 +5,47 @@ Store the node objects in storage or .data()?
 
 
 
-var SupervisorNode = Base.extend({
-    constructor: function(name) {
+var SupervisorHost = Base.extend({
+    constructor: function(name, url) {
         this.name = name;
+        this.root_url = url;
+        this.target_element = null;
+    },
+    
+    update: function() {
+        // Fetch data, render
+        console.log('Updating section for host ' + this.name);
+        var self = this;
+        var host_data = null;
+        this.target_element = $('.host#'+this.name);
+        
+        // Clear, display indicator
+        this.target_element.html('<div>Loading...</div>').css({'backgroundColor':'#EAEAEA'});
+        
+        $.ajax({
+            url: this.root_url,
+            type: "GET",
+            dataType: "json",
+            
+            success: function(data, textStatus, XMLHttpRequest) {
+                self.render(data);
+            },
+            
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("We're flailing about in the dark and we've lost the torch");
+                console.log(XMLHttpRequest, textStatus, errorThrown);
+            }
+        });
+        
+        return host_data;
+    },
+    
+    render: function(data) {
+        // Re-render the section (clear, display activity, get data, render)
+        console.log(data);
+        var summary_elem = $('');
+        var detail_elem = $('');
+        this.target_element.css({'backgroundColor':''}).html('').append(summary_elem, detail_elem);
     },
     
     restart_all: function() {
@@ -41,21 +79,49 @@ var SupervisorNode = Base.extend({
         this.element_selector = '#main_content'; 
         
         this.before(function(context){
-            $('.host').each(function(idx, elem){
-                var elem = $(elem);
-                var node = new SupervisorNode(elem.attr('id'));
-                // node.update()
-                elem.data('node_object', node);
-            });
+            // $('.host').each(function(idx, elem){
+            //                 var elem = $(elem);
+            //                 var node = new SupervisorHost(elem.attr('id'));
+            //                 // node.update()
+            //                 elem.data('node_object', node);
+            //             });
         });
         
         // Front content (all collapsed)
         this.get('#/', function(context) {
             // Collapse all sections NOTE: Won't be needed when the sections are recreated
-            $('.host.expanded').each(function(idx, elem){collapse_host(elem)});
+            //$('.host.expanded').each(function(idx, elem){collapse_host(elem)});
             
-            // TODO: Build each section, call the ajax with update function on success. For each section display activity indicator
-            // call .update() on each node object
+            // 1: Get host list         
+            // 2: For each, create a SupervisorNode, create a section, call update
+            $.ajax({
+                url: "/nodes/",
+                type: "GET",
+                dataType: "json",
+                
+                complete: function(XMLHttpRequest, textStatus) {
+                    //called when complete
+                },
+                
+                success: function(data, textStatus, XMLHttpRequest) {
+                    $.each(data, function(name, url){
+                        console.log('Processing: ' + name, url);
+                        var host = new SupervisorHost(name, url);
+                        $('<div class="host"></div>')
+                            .attr({'id':name})
+                            .appendTo('#main_content')
+                            .data('host_obj', host);
+                        host.update();
+                        //setTimeout("host.update()", 3000);
+                    });
+                },
+                
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("We're flailing about in the dark and we've lost the torch");
+                    console.log(XMLHttpRequest, textStatus, errorThrown);
+                }
+            });
+            
         });
         
         // Expand the node section

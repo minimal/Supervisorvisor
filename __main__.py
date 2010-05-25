@@ -9,6 +9,8 @@ import os.path as path
 from bottle import redirect, request, response, route, send_file
 from mako.lookup import TemplateLookup
 
+import rpclib
+
 
 ## Static routes ##
 @route('/static/:filename#[0-9a-zA-Z\/\-_\.]+#')
