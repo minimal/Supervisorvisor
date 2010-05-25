@@ -50,5 +50,11 @@ if __name__ == '__main__':
     bottle.TEMPLATE_PATH = ['./templates']
     bottle.TemplateLoader = TemplateLookup(directories=bottle.TEMPLATE_PATH)
     
-    bottle.debug(True)
-    bottle.run(host='localhost', port=8080)
+    debug = True
+    
+    if debug:
+        bottle.debug(True)
+        bottle.run(host='localhost', port=8080, reloader=True)
+    else:
+        from bottle import CherryPyServer
+        bottle.run(server=CherryPyServer)
