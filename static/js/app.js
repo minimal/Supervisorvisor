@@ -4,23 +4,26 @@ Store the node objects in storage or .data()?
 */
 
 
+function html_escape(text) {
+    return (text + "").
+        replace(/&/g, "&amp;").
+        replace(/</g, "&lt;").
+        replace(/>/g, "&gt;").
+        replace(/\"/g, "&quot;");
+};
+
 
 var SupervisorHost = Base.extend({
     constructor: function(name, url) {
-        this.name = name;
+        this.name = html_escape(name);
         this.root_url = url;
-        this.target_element = null;
+        this.target_element = $('.host#'+name);
     },
     
-    update: function() {
-        // Fetch data, render
-        console.log('Updating section for host ' + this.name);
+    get_data: function(callback) {
         var self = this;
         var host_data = null;
-        this.target_element = $('.host#'+this.name);
-        
-        // Clear, display indicator
-        this.target_element.html('<div>Loading...</div>').css({'backgroundColor':'#EAEAEA'});
+        var callback = callback || function(data){};
         
         $.ajax({
             url: this.root_url,
@@ -28,7 +31,8 @@ var SupervisorHost = Base.extend({
             dataType: "json",
             
             success: function(data, textStatus, XMLHttpRequest) {
-                self.render(data);
+                host_data = data;
+                callback(data);
             },
             
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -40,17 +44,8 @@ var SupervisorHost = Base.extend({
         return host_data;
     },
     
-    render: function(data) {
-        // Re-render the section (clear, display activity, get data, render)
-        console.log(data);
-        var summary_elem = $('');
-        var detail_elem = $('');
-        this.target_element.css({'backgroundColor':''}).html('').append(summary_elem, detail_elem);
-    },
-    
     restart_all: function() {
         console.log('Restarting all processes on node ' + this.name);
-        //TODO: restart_all() should issue the request, then trigger update_all() to display "restarting" status
         return this;
     },
     
@@ -75,44 +70,24 @@ var SupervisorHost = Base.extend({
 
     var app = $.sammy(function(){
         
-        //this.use(Sammy.Haml);
+        this.use(Sammy.Haml);
         this.element_selector = '#main_content'; 
-        
-        this.before(function(context){
-            // $('.host').each(function(idx, elem){
-            //                 var elem = $(elem);
-            //                 var node = new SupervisorHost(elem.attr('id'));
-            //                 // node.update()
-            //                 elem.data('node_object', node);
-            //             });
-        });
-        
-        // Front content (all collapsed)
+                
         this.get('#/', function(context) {
-            // Collapse all sections NOTE: Won't be needed when the sections are recreated
-            //$('.host.expanded').each(function(idx, elem){collapse_host(elem)});
-            
             // 1: Get host list         
             // 2: For each, create a SupervisorNode, create a section, call update
+            
+            $(this.element_selector).html('');
+            
             $.ajax({
                 url: "/nodes/",
                 type: "GET",
                 dataType: "json",
                 
-                complete: function(XMLHttpRequest, textStatus) {
-                    //called when complete
-                },
-                
                 success: function(data, textStatus, XMLHttpRequest) {
                     $.each(data, function(name, url){
-                        console.log('Processing: ' + name, url);
                         var host = new SupervisorHost(name, url);
-                        $('<div class="host"></div>')
-                            .attr({'id':name})
-                            .appendTo('#main_content')
-                            .data('host_obj', host);
-                        host.update();
-                        //setTimeout("host.update()", 3000);
+                        render_host(host, context);
                     });
                 },
                 
@@ -137,11 +112,11 @@ var SupervisorHost = Base.extend({
         this.get('#/node/:node_name/:action', function(context) {
             var target = $('#'+context.params['node_name']);
             expand_host(target);
-            var node = target.data('node_object');
+            var host = target.data('host_obj');
             
             var per_action_options = {
-                'restart_all': {dialog_title: 'Restart all processes?', dialog_msg: 'Are you sure?', node_action: node.restart_all},
-                'stop_all': {dialog_title: 'Stop all processes?', dialog_msg: 'Are you sure?', node_action: node.stop_all},
+                'restart_all': {dialog_title: 'Restart all processes?', dialog_msg: 'Are you sure?', node_action: host.restart_all},
+                'stop_all': {dialog_title: 'Stop all processes?', dialog_msg: 'Are you sure?', node_action: host.stop_all},
             };
             
             var options = per_action_options[context.params['action']];
@@ -179,6 +154,44 @@ var SupervisorHost = Base.extend({
             target.stop().animate({height: '-=400'}, 'fast');
             target.removeClass('expanded');
         };
+    };
+    
+    var render_host = function(host, context) {
+        // Given a SupervisorHost instance, render the host section //
+        
+        var target_element = $('<div class="host"></div>')
+            .attr({'id':name})
+            .appendTo('#main_content')
+            .data('host_obj', host);
+        
+        // Clear, display indicator
+        target_element.addClass('busy');
+        
+        // Build the render function
+        var render = function(data){
+            target_element.removeClass('busy');
+            
+            var summary_elem = $('<div class="summary"></div>')
+                .append('<div class="status stopped">Stopped</div>')
+                .append( $('<h3 class="address"></h3>').html(host.name) )
+                .append('<p class="">x processes, y stopped, z running</p>')
+                .append('<div class="trafficlights"><span class="running">&nbsp;</span><span class="running">&nbsp;</span><span class="stopped">&nbsp;</span></div>')
+                .append('<div class="expand"><a href="#/node/headingley">detail</a></div>');
+            
+            var detail_elem = $('<div class="detail"></div>')
+                .append('<div class="controls"><a href="#/node/headingley/restart_all">Restart all</a><a href="#/node/headingley/stop_all">Stop all</a></div>')
+                .append('<div class="processes"></div>')
+                .append('<table><tr><th>State</th><th>Description</th><th>Name</th><th>Actions</th></tr>');
+            
+            target_element.css({'backgroundColor':''}).html('').append(summary_elem, detail_elem);
+            
+            $('.expand a', target_element).button({icons: {primary: 'ui-icon-info'}, text: false});
+            $('.remove a', target_element).button({icons: {primary: 'ui-icon-trash'}, text: false});
+            $('.controls a', target_element).button();
+        };
+        
+        // Get data, passing render as callback
+        var data = host.get_data(render);
     };
     
     

@@ -9,6 +9,7 @@
     <script type="text/javascript" src="http://static.office.pirc.co.uk/jquery/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="http://static.office.pirc.co.uk/jquery/jquery-ui-1.8.min.js"></script>
     <script type="text/javascript" src="http://static.office.pirc.co.uk/sammy/sammy-0.5.3.min.js"></script>
+    <script type="text/javascript" src="http://static.office.pirc.co.uk/sammy/plugins/sammy.json-0.5.3.min.js"></script>
     <script type="text/javascript" src="http://static.office.pirc.co.uk/sammy/plugins/sammy.storage-0.5.3.min.js"></script>
     <script type="text/javascript" src="http://static.office.pirc.co.uk/sammy/plugins/sammy.haml-0.5.3.min.js"></script>
     <script src="/static/js/base.js" type="text/javascript" charset="utf-8"></script>
@@ -168,6 +169,13 @@
         .trafficlights .running {background-color: #4EE271;}
         .trafficlights .stopped {background-color: #EDEC76;}
         .trafficlights .error {background-color: #FA7881;}
+        
+        .host.busy {
+            background-image: url(http://static.office.pirc.co.uk/images/indicator1.gif);
+            background-color: #EFEFEF;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
     </style>
 </head>
 
@@ -279,19 +287,19 @@
         $('.remove a').button({icons: {primary: 'ui-icon-trash'}, text: false});
         $('.controls a').button();
         
-    //     $('.expand a').live('click', function(e){
-    //         var that = $(this);
-    //         var container = that.parent().parent().parent();
-    //         
-    //         if (container.hasClass('expanded')) {
-    //             var transformation = '-=400';
-    //         } else {
-    //             var transformation = '+=400';
-    //         };
-    //         
-    //         container.toggleClass('expanded');
-    //         container.stop().animate({height: transformation}, 'fast');
-    //     })
+        $('.expand a').live('click', function(e){
+            var that = $(this);
+            var container = that.parent().parent().parent();
+            
+            if (container.hasClass('expanded')) {
+                var transformation = '-=400';
+            } else {
+                var transformation = '+=400';
+            };
+            
+            container.toggleClass('expanded');
+            container.stop().animate({height: transformation}, 'fast');
+        })
     });
     
 </script>
