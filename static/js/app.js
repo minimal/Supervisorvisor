@@ -44,6 +44,32 @@ var SupervisorHost = Base.extend({
         return host_data;
     },
     
+    summary_stats: function(data) {
+	/* Calculate stats from the node data */
+	var processes = data.length;
+	var running = 0;
+	var stopped = fatal = 0;
+	for (proc in data) {
+	    if (data[proc].statename === 'RUNNING') {
+		running += 1;
+	    }
+	    else if (data[proc].statename === 'STOPPED') {
+		stopped += 1;
+	    }
+	    else if (data[proc].statename === 'FATAL') {
+		fatal += 1;
+	    }
+	};
+	
+	var worst_status = fatal && "Fatal" || stopped && 'Stopped' || running && "Running" || "n/a";
+	
+	return {processes: processes,
+		running: running,
+		stopped: stopped,
+		fatal: fatal,
+		worst_status: worst_status}
+    },
+
     restart_all: function() {
         console.log('Restarting all processes on node ' + this.name);
         return this;
