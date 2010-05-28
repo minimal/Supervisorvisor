@@ -196,21 +196,13 @@ var SupervisorHost = Base.extend({
         // Build the render function
         var render = function(data){
             target_element.removeClass('busy');
-            
-            var summary_elem = $('<div class="summary"></div>')
-                .append('<div class="status stopped">Stopped</div>')
-                .append( $('<h3 class="address"></h3>').html(host.name) )
-                .append('<p class="">x processes, y stopped, z running</p>')
-                .append('<div class="trafficlights"><span class="running">&nbsp;</span><span class="running">&nbsp;</span><span class="stopped">&nbsp;</span></div>')
-                .append('<div class="expand"><a href="#/node/headingley">detail</a></div>');
-            
-            var detail_elem = $('<div class="detail"></div>')
-                .append('<div class="controls"><a href="#/node/headingley/restart_all">Restart all</a><a href="#/node/headingley/stop_all">Stop all</a></div>')
-                .append('<div class="processes"></div>')
-                .append('<table><tr><th>State</th><th>Description</th><th>Name</th><th>Actions</th></tr>');
-            
-            target_element.css({'backgroundColor':''}).html('').append(summary_elem, detail_elem);
-            
+	    var summary_stats = host.summary_stats(data);
+	    context.partial('static/templates/host.haml',
+			    {name: host.name, stats: summary_stats, data:data},
+			    function(rendered) {
+		target_element.append(rendered);
+	    });
+	    
             $('.expand a', target_element).button({icons: {primary: 'ui-icon-info'}, text: false});
             $('.remove a', target_element).button({icons: {primary: 'ui-icon-trash'}, text: false});
             $('.controls a', target_element).button();

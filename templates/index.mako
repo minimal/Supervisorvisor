@@ -115,7 +115,7 @@
         }
         .status.running {background-color: #4EE271;}
         .status.stopped {background-color: #EDEC76;}
-        .status.error {background-color: #FA7881;}
+        .status.fatal {background-color: #FA7881;}
         .host .summary h3 {
             color: #0A7BC1;
             font-weight: bold;
@@ -168,7 +168,7 @@
         }
         .trafficlights .running {background-color: #4EE271;}
         .trafficlights .stopped {background-color: #EDEC76;}
-        .trafficlights .error {background-color: #FA7881;}
+        .trafficlights .fatal {background-color: #FA7881;}
         
         .host.busy {
             background-image: url(http://static.office.pirc.co.uk/images/indicator1.gif);

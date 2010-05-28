@@ -1,0 +1,29 @@
+
+%div.summary
+  %div{class: "status " + stats.worst_status.toLowerCase()}
+    = stats.worst_status
+  %h3.address
+    = name
+  %p
+    #{stats.processes} processes: #{stats.running}
+      running, #{stats.stopped} stopped, #{stats.fatal} fatal
+  %div.trafficlights
+    :each proc in data
+      %span{class: proc.statename.toLowerCase()} &nbsp;
+  %div.expand
+    %a{href: "#/node/" + name} detail
+%div.detail
+  %div.controls
+    %a{href: "#/node/" + name + "/restart_all"} Restart All
+  %div.processes
+  %table
+    %tr
+      %th State
+      %th Description
+      %th Actions
+    :each proc in data
+      %tr
+        %td{class: "status " + proc.statename.toLowerCase()} = proc.statename
+        %td #{proc.name}: #{proc.description}
+    
+
