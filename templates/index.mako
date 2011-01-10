@@ -75,7 +75,7 @@
         	-webkit-border-radius: 8px;
         	margin: 5px 0;
         	border: 2px solid #bbb;
-        	height: 60px;
+        	//height: 60px;
         	min-height: 60px;
         	width: 100%;
         	overflow: hidden;
@@ -132,6 +132,7 @@
             top: 15px;
         }
         .host .detail {
+            display: None;
             border: 1px solid #bbb;
             -moz-border-radius: 3px;
         	-webkit-border-radius: 3px;
@@ -184,7 +185,7 @@
         <div id="hd">
             <div id="wrapper">
             <div id="title">
-                <p>Supervisor Dashboard</p>
+                <p><a href="/">Supervisor Dashboard</a></p>
             </div>
             <div id="nav">
                 <a href="#/add" id="add">Add host</a>
@@ -210,16 +211,8 @@
         
         $('.expand a').live('click', function(e){
             var that = $(this);
-            var container = that.parent().parent().parent();
-            
-            if (container.hasClass('expanded')) {
-                var transformation = '-=400';
-            } else {
-                var transformation = '+=400';
-            };
-            
-            container.toggleClass('expanded');
-            container.stop().animate({height: transformation}, 'fast');
+            var container = that.parent().parent().parent().find(".detail");
+            container.slideToggle();            
         })
     });
     

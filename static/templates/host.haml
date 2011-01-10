@@ -1,5 +1,5 @@
 
-%div.summary
+%div.summary{id: name}
   %div{class: "status " + stats.worst_status.toLowerCase()}
     = stats.worst_status
   %h3.address
@@ -9,9 +9,9 @@
       running, #{stats.stopped} stopped, #{stats.fatal} fatal
   %div.trafficlights
     :each proc in data
-      %span{class: proc.statename.toLowerCase()} &nbsp;
+      %span{class: proc.statename.toLowerCase(), title: proc.name} &nbsp;
   %div.expand
-    %a{href: "#/node/" + name} detail
+    %a{href: "#/"} detail
 %div.detail
   %div.controls
     %a{href: "#/node/" + name + "/restart_all"} Restart All
